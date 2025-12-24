@@ -110,14 +110,15 @@ python main.py
 
 | 功能 | 模型 | 说明 |
 |------|------|------|
-| 文生图 | `sora-image*` | 使用 `content` 为字符串 |
-| 图生图 | `sora-image*` | 使用 `content` 数组 + `image_url` |
-| 文生视频 | `sora-video*` | 使用 `content` 为字符串 |
-| 图生视频 | `sora-video*` | 使用 `content` 数组 + `image_url` |
-| 创建角色 | `sora-video*` | 使用 `content` 数组 + `video_url` |
-| 角色生成视频 | `sora-video*` | 使用 `content` 数组 + `video_url` + 文本 |
-| Remix | `sora-video*` | 在 `content` 中包含 Remix ID |
-| 视频分镜 | `sora-video*` | 在 `content` 中使用```[时长s]提示词```格式触发 |
+| 文生图 | `gpt-image*` | 使用 `content` 为字符串 |
+| 图生图 | `gpt-image*` | 使用 `content` 数组 + `image_url` |
+| 文生视频 | `sora2-*` | 使用 `content` 为字符串 |
+| 图生视频 | `sora2-*` | 使用 `content` 数组 + `image_url` |
+| 视频风格 | `sora2-*` | 在提示词中使用 `{风格ID}` 格式,如 `{anime}提示词` |
+| 创建角色 | `sora2-*` | 使用 `content` 数组 + `video_url` |
+| 角色生成视频 | `sora2-*` | 使用 `content` 数组 + `video_url` + 文本 |
+| Remix | `sora2-*` | 在 `content` 中包含 Remix ID |
+| 视频分镜 | `sora2-*` | 在 `content` 中使用```[时长s]提示词```格式触发 |
 
 ---
 
@@ -135,20 +136,44 @@ python main.py
 
 | 模型 | 说明 | 尺寸 |
 |------|------|------|
-| `sora-image` | 文生图（默认） | 360×360 |
-| `sora-image-landscape` | 文生图（横屏） | 540×360 |
-| `sora-image-portrait` | 文生图（竖屏） | 360×540 |
+| `gpt-image` | 文生图（正方形） | 360×360 |
+| `gpt-image-landscape` | 文生图（横屏） | 540×360 |
+| `gpt-image-portrait` | 文生图（竖屏） | 360×540 |
 
 **视频模型**
 
+**标准版（Sora2）**
+
 | 模型 | 时长 | 方向 | 说明 |
 |------|------|------|------|
-| `sora-video-10s` | 10秒 | 横屏 | 文生视频/图生视频 |
-| `sora-video-15s` | 15秒 | 横屏 | 文生视频/图生视频 |
-| `sora-video-landscape-10s` | 10秒 | 横屏 | 文生视频/图生视频 |
-| `sora-video-landscape-15s` | 15秒 | 横屏 | 文生视频/图生视频 |
-| `sora-video-portrait-10s` | 10秒 | 竖屏 | 文生视频/图生视频 |
-| `sora-video-portrait-15s` | 15秒 | 竖屏 | 文生视频/图生视频 |
+| `sora2-landscape-10s` | 10秒 | 横屏 | 文生视频/图生视频 |
+| `sora2-landscape-15s` | 15秒 | 横屏 | 文生视频/图生视频 |
+| `sora2-landscape-25s` | 25秒 | 横屏 | 文生视频/图生视频 |
+| `sora2-portrait-10s` | 10秒 | 竖屏 | 文生视频/图生视频 |
+| `sora2-portrait-15s` | 15秒 | 竖屏 | 文生视频/图生视频 |
+| `sora2-portrait-25s` | 25秒 | 竖屏 | 文生视频/图生视频 |
+
+**Pro 版（需要 ChatGPT Pro 订阅）**
+
+| 模型 | 时长 | 方向 | 说明 |
+|------|------|------|------|
+| `sora2pro-landscape-10s` | 10秒 | 横屏 | Pro 质量文生视频/图生视频 |
+| `sora2pro-landscape-15s` | 15秒 | 横屏 | Pro 质量文生视频/图生视频 |
+| `sora2pro-landscape-25s` | 25秒 | 横屏 | Pro 质量文生视频/图生视频 |
+| `sora2pro-portrait-10s` | 10秒 | 竖屏 | Pro 质量文生视频/图生视频 |
+| `sora2pro-portrait-15s` | 15秒 | 竖屏 | Pro 质量文生视频/图生视频 |
+| `sora2pro-portrait-25s` | 25秒 | 竖屏 | Pro 质量文生视频/图生视频 |
+
+**Pro HD 版（需要 ChatGPT Pro 订阅，高清质量）**
+
+| 模型 | 时长 | 方向 | 说明 |
+|------|------|------|------|
+| `sora2pro-hd-landscape-10s` | 10秒 | 横屏 | Pro 高清文生视频/图生视频 |
+| `sora2pro-hd-landscape-15s` | 15秒 | 横屏 | Pro 高清文生视频/图生视频 |
+| `sora2pro-hd-portrait-10s` | 10秒 | 竖屏 | Pro 高清文生视频/图生视频 |
+| `sora2pro-hd-portrait-15s` | 15秒 | 竖屏 | Pro 高清文生视频/图生视频 |
+
+> **注意：** Pro 系列模型需要 ChatGPT Pro 订阅（`plan_type: "chatgpt_pro"`）。如果没有 Pro 账号，请求这些模型会返回错误。
 
 #### 请求示例
 
@@ -159,13 +184,14 @@ curl -X POST "http://localhost:8000/v1/chat/completions" \
   -H "Authorization: Bearer han1234" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "sora-image",
+    "model": "gpt-image",
     "messages": [
       {
         "role": "user",
         "content": "一只可爱的小猫咪"
       }
-    ]
+    ],
+    "stream": true
   }'
 ```
 
@@ -176,7 +202,7 @@ curl -X POST "http://localhost:8000/v1/chat/completions" \
   -H "Authorization: Bearer han1234" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "sora-image",
+    "model": "gpt-image",
     "messages": [
       {
         "role": "user",
@@ -205,7 +231,7 @@ curl -X POST "http://localhost:8000/v1/chat/completions" \
   -H "Authorization: Bearer han1234" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "sora-video-landscape-10s",
+    "model": "sora2-landscape-10s",
     "messages": [
       {
         "role": "user",
@@ -223,7 +249,7 @@ curl -X POST "http://localhost:8000/v1/chat/completions" \
   -H "Authorization: Bearer han1234" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "sora-video-landscape-10s",
+    "model": "sora2-landscape-10s",
     "messages": [
       {
         "role": "user",
@@ -254,13 +280,14 @@ curl -X POST "http://localhost:8000/v1/chat/completions" \
   -H "Authorization: Bearer han1234" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "sora-video-landscape-10s",
+    "model": "sora2-landscape-10s",
     "messages": [
       {
         "role": "user",
         "content": "https://sora.chatgpt.com/p/s_68e3a06dcd888191b150971da152c1f5改成水墨画风格"
       }
-    ]
+    ],
+    "stream": true
   }'
 ```
 
@@ -280,13 +307,14 @@ curl -X POST "http://localhost:8000/v1/chat/completions" \
   -H "Authorization: Bearer han1234" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "sora-video-landscape-10s",
+    "model": "sora2-landscape-10s",
     "messages": [
       {
         "role": "user",
         "content": "[5.0s]猫猫从飞机上跳伞 [5.0s]猫猫降落 [10.0s]猫猫在田野奔跑"
       }
-    ]
+    ],
+    "stream": true
   }'
 ```
 
@@ -322,7 +350,7 @@ curl -X POST "http://localhost:8000/v1/chat/completions" \
   -H "Authorization: Bearer han1234" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "sora-video-landscape-10s",
+    "model": "sora2-landscape-10s",
     "messages": [
       {
         "role": "user",
@@ -340,7 +368,7 @@ curl -X POST "http://localhost:8000/v1/chat/completions" \
   -H "Authorization: Bearer han1234" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "sora-video-landscape-10s",
+    "model": "sora2-landscape-10s",
     "messages": [
       {
         "role": "user",
@@ -358,7 +386,7 @@ curl -X POST "http://localhost:8000/v1/chat/completions" \
   -H "Authorization: Bearer han1234" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "sora-video-landscape-10s",
+    "model": "sora2-landscape-10s",
     "messages": [
       {
         "role": "user",
@@ -394,7 +422,7 @@ curl -X POST "http://localhost:8000/v1/chat/completions" \
   -H "Authorization: Bearer han1234" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "sora-video-landscape-10s",
+    "model": "sora2-landscape-10s",
     "messages": [
       {
         "role": "user",
@@ -421,7 +449,7 @@ curl -X POST "http://localhost:8000/v1/chat/completions" \
   -H "Authorization: Bearer han1234" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "sora-video-landscape-10s",
+    "model": "sora2-landscape-10s",
     "messages": [
       {
         "role": "user",
@@ -461,7 +489,7 @@ response = requests.post(
         "Content-Type": "application/json"
     },
     json={
-        "model": "sora-video-landscape-10s",
+        "model": "sora2-landscape-10s",
         "messages": [
             {
                 "role": "user",

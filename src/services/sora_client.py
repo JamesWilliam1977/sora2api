@@ -254,8 +254,20 @@ class SoraClient:
         return result["id"]
     
     async def generate_video(self, prompt: str, token: str, orientation: str = "landscape",
-                            media_id: Optional[str] = None, n_frames: int = 450, style_id: Optional[str] = None) -> str:
-        """Generate video (text-to-video or image-to-video)"""
+                            media_id: Optional[str] = None, n_frames: int = 450, style_id: Optional[str] = None,
+                            model: str = "sy_8", size: str = "small") -> str:
+        """Generate video (text-to-video or image-to-video)
+
+        Args:
+            prompt: Video generation prompt
+            token: Access token
+            orientation: Video orientation (landscape/portrait)
+            media_id: Optional image media_id for image-to-video
+            n_frames: Number of frames (300/450/750)
+            style_id: Optional style ID
+            model: Model to use (sy_8 for standard, sy_ore for pro)
+            size: Video size (small for standard, large for HD)
+        """
         inpaint_items = []
         if media_id:
             inpaint_items = [{
@@ -267,9 +279,9 @@ class SoraClient:
             "kind": "video",
             "prompt": prompt,
             "orientation": orientation,
-            "size": "small",
+            "size": size,
             "n_frames": n_frames,
-            "model": "sy_8",
+            "model": model,
             "inpaint_items": inpaint_items,
             "style_id": style_id
         }

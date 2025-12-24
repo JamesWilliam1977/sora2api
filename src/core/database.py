@@ -144,12 +144,12 @@ class Database:
         if count[0] == 0:
             # Get generation config from config_dict if provided, otherwise use defaults
             image_timeout = 300
-            video_timeout = 1500
+            video_timeout = 3000
 
             if config_dict:
                 generation_config = config_dict.get("generation", {})
                 image_timeout = generation_config.get("image_timeout", 300)
-                video_timeout = generation_config.get("video_timeout", 1500)
+                video_timeout = generation_config.get("video_timeout", 3000)
 
             await db.execute("""
                 INSERT INTO generation_config (id, image_timeout, video_timeout)
@@ -401,7 +401,7 @@ class Database:
                 CREATE TABLE IF NOT EXISTS generation_config (
                     id INTEGER PRIMARY KEY DEFAULT 1,
                     image_timeout INTEGER DEFAULT 300,
-                    video_timeout INTEGER DEFAULT 1500,
+                    video_timeout INTEGER DEFAULT 3000,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
@@ -1013,7 +1013,7 @@ class Database:
                 return GenerationConfig(**dict(row))
             # If no row exists, return a default config
             # This should not happen in normal operation as _ensure_config_rows should create it
-            return GenerationConfig(image_timeout=300, video_timeout=1500)
+            return GenerationConfig(image_timeout=300, video_timeout=3000)
 
     async def update_generation_config(self, image_timeout: int = None, video_timeout: int = None):
         """Update generation configuration"""
@@ -1027,10 +1027,10 @@ class Database:
                 current = dict(row)
                 # Update only provided fields
                 new_image_timeout = image_timeout if image_timeout is not None else current.get("image_timeout", 300)
-                new_video_timeout = video_timeout if video_timeout is not None else current.get("video_timeout", 1500)
+                new_video_timeout = video_timeout if video_timeout is not None else current.get("video_timeout", 3000)
             else:
                 new_image_timeout = image_timeout if image_timeout is not None else 300
-                new_video_timeout = video_timeout if video_timeout is not None else 1500
+                new_video_timeout = video_timeout if video_timeout is not None else 3000
 
             await db.execute("""
                 UPDATE generation_config

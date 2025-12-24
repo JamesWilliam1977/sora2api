@@ -19,52 +19,139 @@ from ..core.logger import debug_logger
 
 # Model configuration
 MODEL_CONFIG = {
-    "sora-image": {
+    "gpt-image": {
         "type": "image",
         "width": 360,
         "height": 360
     },
-    "sora-image-landscape": {
+    "gpt-image-landscape": {
         "type": "image",
         "width": 540,
         "height": 360
     },
-    "sora-image-portrait": {
+    "gpt-image-portrait": {
         "type": "image",
         "width": 360,
         "height": 540
     },
     # Video models with 10s duration (300 frames)
-    "sora-video-10s": {
+    "sora2-landscape-10s": {
         "type": "video",
         "orientation": "landscape",
         "n_frames": 300
     },
-    "sora-video-landscape-10s": {
-        "type": "video",
-        "orientation": "landscape",
-        "n_frames": 300
-    },
-    "sora-video-portrait-10s": {
+    "sora2-portrait-10s": {
         "type": "video",
         "orientation": "portrait",
         "n_frames": 300
     },
     # Video models with 15s duration (450 frames)
-    "sora-video-15s": {
+    "sora2-landscape-15s": {
         "type": "video",
         "orientation": "landscape",
         "n_frames": 450
     },
-    "sora-video-landscape-15s": {
-        "type": "video",
-        "orientation": "landscape",
-        "n_frames": 450
-    },
-    "sora-video-portrait-15s": {
+    "sora2-portrait-15s": {
         "type": "video",
         "orientation": "portrait",
         "n_frames": 450
+    },
+    # Video models with 25s duration (750 frames)
+    "sora2-landscape-25s": {
+        "type": "video",
+        "orientation": "landscape",
+        "n_frames": 750,
+        "model": "sy_8",
+        "size": "small"
+    },
+    "sora2-portrait-25s": {
+        "type": "video",
+        "orientation": "portrait",
+        "n_frames": 750,
+        "model": "sy_8",
+        "size": "small"
+    },
+    # Pro video models (require Pro subscription)
+    "sora2pro-landscape-10s": {
+        "type": "video",
+        "orientation": "landscape",
+        "n_frames": 300,
+        "model": "sy_ore",
+        "size": "small",
+        "require_pro": True
+    },
+    "sora2pro-portrait-10s": {
+        "type": "video",
+        "orientation": "portrait",
+        "n_frames": 300,
+        "model": "sy_ore",
+        "size": "small",
+        "require_pro": True
+    },
+    "sora2pro-landscape-15s": {
+        "type": "video",
+        "orientation": "landscape",
+        "n_frames": 450,
+        "model": "sy_ore",
+        "size": "small",
+        "require_pro": True
+    },
+    "sora2pro-portrait-15s": {
+        "type": "video",
+        "orientation": "portrait",
+        "n_frames": 450,
+        "model": "sy_ore",
+        "size": "small",
+        "require_pro": True
+    },
+    "sora2pro-landscape-25s": {
+        "type": "video",
+        "orientation": "landscape",
+        "n_frames": 750,
+        "model": "sy_ore",
+        "size": "small",
+        "require_pro": True
+    },
+    "sora2pro-portrait-25s": {
+        "type": "video",
+        "orientation": "portrait",
+        "n_frames": 750,
+        "model": "sy_ore",
+        "size": "small",
+        "require_pro": True
+    },
+    # Pro HD video models (require Pro subscription, high quality)
+    "sora2pro-hd-landscape-10s": {
+        "type": "video",
+        "orientation": "landscape",
+        "n_frames": 300,
+        "model": "sy_ore",
+        "size": "large",
+        "require_pro": True
+    },
+    "sora2pro-hd-portrait-10s": {
+        "type": "video",
+        "orientation": "portrait",
+        "n_frames": 300,
+        "model": "sy_ore",
+        "size": "large",
+        "require_pro": True
+    },
+    "sora2pro-hd-landscape-15s": {
+        "type": "video",
+        "orientation": "landscape",
+        "n_frames": 450,
+        "model": "sy_ore",
+        "size": "large",
+        "require_pro": True
+    },
+    "sora2pro-hd-portrait-15s": {
+        "type": "video",
+        "orientation": "portrait",
+        "n_frames": 450,
+        "model": "sy_ore",
+        "size": "large",
+        "require_pro": True
     }
 }
 
@@ -294,10 +381,20 @@ class GenerationHandler:
                     return
 
         # Streaming mode: proceed with actual generation
+        # Check if model requires Pro subscription
+        require_pro = model_config.get("require_pro", False)
+
         # Select token (with lock for image generation, Sora2 quota check for video generation)
-        token_obj = await self.load_balancer.select_token(for_image_generation=is_image, for_video_generation=is_video)
+        # If Pro is required, filter for Pro tokens only
+        token_obj = await self.load_balancer.select_token(
+            for_image_generation=is_image,
+            for_video_generation=is_video,
+            require_pro=require_pro
+        )
         if not token_obj:
-            if is_image:
+            if require_pro:
+                raise Exception("No available Pro tokens. Pro models require a ChatGPT Pro subscription.")
+            elif is_image:
                 raise Exception("No available tokens for image generation. All tokens are either disabled, cooling down, locked, or expired.")
             else:
                 raise Exception("No available tokens for video generation. All tokens are either disabled, cooling down, Sora2 quota exhausted, don't support Sora2, or expired.")
@@ -383,12 +480,18 @@ class GenerationHandler:
                     )
                 else:
                     # Normal video generation
+                    # Get model and size from config (default to sy_8 and small for backward compatibility)
+                    sora_model = model_config.get("model", "sy_8")
+                    video_size = model_config.get("size", "small")
+
                     task_id = await self.sora_client.generate_video(
                         clean_prompt, token_obj.token,
                         orientation=model_config["orientation"],
                         media_id=media_id,
                         n_frames=n_frames,
-                        style_id=style_id
+                        style_id=style_id,
+                        model=sora_model,
+                        size=video_size
                     )
             else:
                 task_id = await self.sora_client.generate_image(
@@ -1271,10 +1374,16 @@ class GenerationHandler:
             # Get n_frames from model configuration
             n_frames = model_config.get("n_frames", 300)  # Default to 300 frames (10s)
 
+            # Get model and size from config (default to sy_8 and small for backward compatibility)
+            sora_model = model_config.get("model", "sy_8")
+            video_size = model_config.get("size", "small")
+
             task_id = await self.sora_client.generate_video(
                 full_prompt, token_obj.token,
                 orientation=model_config["orientation"],
-                n_frames=n_frames
+                n_frames=n_frames,
+                model=sora_model,
+                size=video_size
             )
             debug_logger.log_info(f"Video generation started, task_id: {task_id}")
 
@@ -1282,7 +1391,7 @@ class GenerationHandler:
             task = Task(
                 task_id=task_id,
                 token_id=token_obj.id,
-                model=f"sora-video-{model_config['orientation']}",
+                model=f"sora2-video-{model_config['orientation']}",
                 prompt=full_prompt,
                 status="processing",
                 progress=0.0
@@ -1375,7 +1484,7 @@ class GenerationHandler:
             task = Task(
                 task_id=task_id,
                 token_id=token_obj.id,
-                model=f"sora-video-{model_config['orientation']}",
+                model=f"sora2-video-{model_config['orientation']}",
                 prompt=f"remix:{remix_target_id} {clean_prompt}",
                 status="processing",
                 progress=0.0
